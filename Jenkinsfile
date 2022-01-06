@@ -18,13 +18,13 @@
 String javaVersionId = 'jdk-17' // id that matches the java tool with the java version that should be used set as jenkins property
 
 /* git configuration */
-String projectName = 'PowerSystemDataModel' // name of the repository, is case insensitive
+String projectName = 'PSDM_jenkinsDev' // name of the repository, is case insensitive
 String orgName = 'ie3-institute' // name of the github organization
 String gitCheckoutUrl = "git@github.com:$orgName/${projectName}.git"
 String sshCredentialsId = '19f16959-8a0d-4a60-bd1f-5adb4572b702' // id that matches the ssh credentials to interact with the git set as jenkins property
 
 /* ci configuration */
-String sonarqubeProjectKey = 'edu.ie3:PowerSystemDataModel' // sonarqube project key, case-sensitive
+String sonarqubeProjectKey = 'edu.ie3:PSDM_jenkinsDev' // sonarqube project key, case-sensitive
 String codeCovTokenId = 'psdm-codecov-token' // id that matches the code coverage token set as jenkins property
 
 /* maven central configuration */
@@ -111,39 +111,6 @@ node {
         }
       }
 
-      // test the project
-      stage('run tests') {
-
-        sh 'java -version'
-
-        gradle('--refresh-dependencies clean spotlessCheck pmdMain pmdTest spotbugsMain ' +
-            'spotbugsTest test jacocoTestReport jacocoTestCoverageVerification', projectName)
-
-        // due to an issue with openjdk-8 we use openjdk-11 for javadocs generation
-        sh(script: """set +x && cd $projectName""" + ''' set +x; ./gradlew clean javadoc -Dorg.gradle.java.home=/opt/java/openjdk''', returnStdout: true)
-      }
-
-      // sonarqube analysis
-      stage('sonarqube analysis') {
-        String sonarqubeCurrentBranchName = prFromFork() ? prJsonObj.head.repo.full_name : currentBranchName // forks needs to be handled differently
-        String sonarqubeCmd = determineSonarqubeGradleCmd(sonarqubeProjectKey, sonarqubeCurrentBranchName, targetBranchName, orgName, projectName, projectName)
-        withSonarQubeEnv() {
-          // will pick the global server connection from jenkins for sonarqube
-          gradle(sonarqubeCmd, projectName)
-        }
-      }
-
-      // sonarqube quality gate
-      stage("quality gate") {
-        timeout(time: 1, unit: 'HOURS') {
-          // just in case something goes wrong, pipeline will be killed after a timeout
-          def qg = waitForQualityGate() // reuse taskId previously collected by withSonarQubeEnv
-          if (qg.status != 'OK') {
-            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-          }
-        }
-      }
-
       // deploy stage only if branch is main or dev
       if (env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") {
         stage('deploy') {
@@ -169,17 +136,6 @@ node {
                 returnStdout: true
                 )
 
-            String deployGradleTasks = "--refresh-dependencies test " +
-                "publish -Puser=${env.mavencentral_username} " +
-                "-Ppassword=${env.mavencentral_password} " +
-                "-Psigning.keyId=${env.signingKeyId} " +
-                "-Psigning.password=${env.signingPassword} " +
-                "-Psigning.secretKeyRingFile=${env.mavenCentralKeyFile} " +
-                "-PdeployVersion='$projectVersion'"
-
-            // see https://docs.gradle.org/6.0.1/release-notes.html "Publication of SHA256 and SHA512 checksums"
-            def preventSHACheckSums = "-Dorg.gradle.internal.publish.checksums.insecure=true"
-            gradle("${deployGradleTasks} $preventSHACheckSums", projectName)
           }
 
           if (env.BRANCH_NAME == "main") {
@@ -189,7 +145,7 @@ node {
             // todo JH create github release
 
             // deploy java docs
-            deployJavaDocs(projectName, sshCredentialsId, gitCheckoutUrl)
+
           }
 
           // notify rocket chat
@@ -204,22 +160,6 @@ node {
       }
 
       // post processing
-      stage('post processing') {
-
-        // publish reports
-        publishReports(projectName)
-
-        // call codecov.io
-        withCredentials([
-          string(credentialsId: codeCovTokenId, variable: 'codeCovToken')
-        ]) {
-          sh "curl -s https://codecov.io/bash | bash -s - -t ${env.codeCovToken} -C ${commitHash}"
-        }
-
-        // notify Rocket.Chat
-        String successMsg = buildSuccessMsg(currentBranchName, targetBranchName, projectName)
-        notifyRocketChat(rocketChatChannel, ':jenkins_party:', successMsg)
-      }
 
     } catch (Exception e) {
       // set build result to failure
