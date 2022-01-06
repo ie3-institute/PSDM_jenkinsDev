@@ -5,7 +5,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+
+## [Unreleased](https://gitlab.com/html-validate/html-validate/compare/Unreleased) ()
+
+
+### Chore
+
+ -  fmt ([50df7404c29b39f](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/50df7404c29b39f))
+
+
+
+### Bug Fixes
+
+ -  test ([f885445623adbec](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/f885445623adbec))
+
+
+
 ## [2.1.0](https://gitlab.com/html-validate/html-validate/compare/2.1.0) (2022-01-05)
+
+
+
 
 
 ### Bug Fixes
@@ -14,7 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  -  applied spotless with java 8 (instead of 11) ([fd9f8296f544c65](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/fd9f8296f544c65))
  -  resolved static code analysis issues + applied spotless ([99d8efa1a3fcd7d](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/99d8efa1a3fcd7d))
 
+
+
 ## [2.0.1](https://gitlab.com/html-validate/html-validate/compare/2.0.1) (2021-07-09)
+
+
+
+
+
 
 
 
@@ -22,7 +48,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+
+
+
+
 ## [1.1.0](https://gitlab.com/html-validate/html-validate/compare/1.1.0) (2020-09-14)
+
+
+
+
+
+
+
+
+## [v1.0](https://gitlab.com/html-validate/html-validate/compare/v1.0) (2020-04-17)
+
+
+
 
 
 
