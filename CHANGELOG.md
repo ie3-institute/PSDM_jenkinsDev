@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
- -  fmt ([50df7404c29b39f](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/50df7404c29b39f))
+ -  test ([4082b09d7336849](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/4082b09d7336849))
 
 
 
