@@ -111,6 +111,19 @@ node {
         }
       }
 
+      // PR name check 4 feature branches only and only if a PR is already handed in
+      if(isFeatureBranch(currentBranchName) == 0 && prJsonObj != null){
+        stage('PR name check') {
+          String prName = prJsonObj.title
+          if(!isConventionalCommit(prName)){
+            String errorMsg = "PR title does not match conventional commit convention." +
+                "Please add a prefix in front of your PR title, e.g. [FIX]: or [FEAT]: ..."
+            println errorMsg
+            error errorMsg
+          }
+        }
+      }
+
       // deploy stage only if branch is main or dev
       if (env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") {
         stage('deploy') {
@@ -509,6 +522,19 @@ def getPRJsonObj(String orgName, String projectName, String changeId) {
 }
 
 
+
+def isFeatureBranch(String branchName){
+  String branchType = prFromFork() ? "feature" : getBranchType(branchName)
+  if (branchType == null) {
+    error "Cannot derive branch type from current branch with name '$branchName'."
+  }
+  if(branchType == "feature"){
+    return 0
+  }
+  return -1
+}
+
+
 def checkVersion(String branchName, String targetBranchName, String relativeGitDir,
     String projectName,
     String baseGitCheckoutUrl,
@@ -690,6 +716,33 @@ def getBranchType(String branchName) {
     return "dev"
   } else if (branchName =~ hotfix_pattern) {
     return "hotfix"
+  } else {
+    return null
+  }
+}
+
+def isConventionalCommit(String commitMsg){
+  conventionalCommit(commitMsg) != null
+}
+
+def conventionalCommit(String commitMsg) {
+  String fix_pattern = "\\[FIX\\]\\s.*"
+  String feat_pattern = "\\[FEAT\\]\\s.*"
+  String improve_pattern = "\\[IMPROVE\\]\\s.*"
+  String breaking_pattern = "\\[BREAKING\\]\\s.*"
+  String dependabot_pattern = "Bump\\s.*"
+  String chore_pattern = "\\[CHORE\\]\\s.*"
+
+  if (commitMsg =~ chore_pattern || commitMsg =~ dependabot_pattern) {
+    return "chore"
+  } else if (commitMsg =~ fix_pattern) {
+    return "fix"
+  } else if (commitMsg =~ feat_pattern) {
+    return "feature"
+  } else if (commitMsg =~ improve_pattern) {
+    return "improve"
+  } else if (commitMsg =~ breaking_pattern) {
+    return "breaking"
   } else {
     return null
   }
