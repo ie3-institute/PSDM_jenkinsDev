@@ -116,7 +116,7 @@ node {
         stage('PR name check') {
           String prName = prJsonObj.title
           if(!isConventionalCommit(prName)){
-            String errorMsg = "PR title does not match conventional commit convention." +
+            String errorMsg = "PR title '$prName' does not match conventional commit convention. " +
                 "Please add a prefix in front of your PR title, e.g. [FIX]: or [FEAT]: ..."
             println errorMsg
             error errorMsg
