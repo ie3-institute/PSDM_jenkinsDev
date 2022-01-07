@@ -130,7 +130,7 @@ node {
       // update changelog.md if current branch is dev branch
       if(env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") {
         stage('changelog update') {
-          changelogUpdate( projectName, sshCredentialsId, gitCheckoutUrl, env.BRANCH_NAME)
+          changelogUpdate( projectName, sshCredentialsId, gitCheckoutUrl, env.BRANCH_NAME, updateChangelogMsg)
         }
       }
 
@@ -808,7 +808,7 @@ def conventionalCommit(String commitMsg) {
   }
 }
 
-def changelogUpdate(String projectName, String sshCredentialsId, String gitCheckoutUrl, String changelogBranchRef) {
+def changelogUpdate(String projectName, String sshCredentialsId, String gitCheckoutUrl, String changelogBranchRef, String updateChangelogMsg) {
 
   println "updating changeling in branch $changelogBranchRef ..."
   try {
