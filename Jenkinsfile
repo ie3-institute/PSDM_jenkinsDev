@@ -763,7 +763,7 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       // set mail and name in git config
       sh(script: "set +x && cd $projectName && " +
       "git config user.email 'johannes.hiry@tu-dortmund.de' && " +
-      "git config user.name 'Johannes Hiry'", returnStdout: false)
+      "git config user.name 'Johannes Hiry'", returnStdout: true)
 
       // pull latest version of changelogBranch + update changelog + commit + push back
       sh(script: "set +x && cd $projectName && " +
@@ -774,7 +774,7 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       "git commit -m \"updated CHANGELOG.md\" && " +
       "git push" +
       "\"",
-      returnStdout: false)
+      returnStdout: true)
     }
   } catch (Exception e) {
     println "Error during changelog update! Please consider updating it manually! Exception: $e"
