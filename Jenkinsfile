@@ -769,7 +769,7 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       println sh(script: "set +x && cd $projectName && " +
       "git checkout $changelogBranchRef && git fetch && git pull && " +
       "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
-      "./gradlew genChangelog -PtoRef=$toRef spotlessApply && " +
+      "./gradlew genChangelog -PtoRef=$changelogBranchRef spotlessApply && " +
       "git add CHANGELOG.md && " +
       "git commit -m \"updated CHANGELOG.md\" && " +
       "git push" +
