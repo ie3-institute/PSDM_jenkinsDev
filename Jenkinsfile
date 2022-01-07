@@ -135,7 +135,8 @@ node {
       }
 
       // deploy stage only if branch is main or dev AND if the commit message is not "updated CHANGELOG.md"
-      Boolean isUpdatedChangelog = curlByCSHA(commitHash, orgName, projectName).commit.message == updateChangelogMsg
+      String commitMsg = getGithubCommitJsonObj(commitHash, orgName, projectName).commit.message
+      Boolean isUpdatedChangelog = commitMsg == updateChangelogMsg
       if ((env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") && !isUpdatedChangelog) {
         stage('deploy') {
           // determine project version
