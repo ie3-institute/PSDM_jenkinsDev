@@ -775,7 +775,7 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       "./gradlew genChangelog -PtoRef=$changelogBranchRef spotlessApply && " +
       "git add CHANGELOG.md; " +
       "git commit -m \"updated CHANGELOG.md\"; " +
-      "git push" +
+      "git push --set-upstream origin $changelogBranchRef" +
       "\"",
       returnStdout: true)
     }
