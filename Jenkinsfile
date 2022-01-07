@@ -761,12 +761,12 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       sshUserPrivateKey(credentialsId: sshCredentialsId, keyFileVariable: 'sshKey')
     ]) {
       // set mail and name in git config
-      sh(script: "set +x && cd $projectName && " +
+      println sh(script: "set +x && cd $projectName && " +
       "git config user.email 'johannes.hiry@tu-dortmund.de' && " +
       "git config user.name 'Johannes Hiry'", returnStdout: true)
 
       // pull latest version of changelogBranch + update changelog + commit + push back
-      sh(script: "set +x && cd $projectName && " +
+      println sh(script: "set +x && cd $projectName && " +
       "git checkout $changelogBranchRef && git fetch && git pull && " +
       "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
       "./gradlew genChangelog -PtoRef=$toRef spotlessApply && " +
