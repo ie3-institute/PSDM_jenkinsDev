@@ -24,12 +24,6 @@ fixes : "has" and number : 9a587fc1d0ee4d6 message: [CHORE] fmt
 
 ## [2.1.0](https://gitlab.com/html-validate/html-validate/compare/2.1.0) (2022-01-05)
 
-
-
-
-
-
-
 ### Bug Fixes
 
 -  further formatting fixes (Codacy + Jenkins) ([06bc738cdeb2ce9](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/06bc738cdeb2ce9))
