@@ -135,6 +135,7 @@ node {
       }
 
       // deploy stage only if branch is main or dev AND if the commit message is not "updated CHANGELOG.md"
+      // because a deployment only for the changelog is useless
       String commitMsg = getGithubCommitJsonObj(commitHash, orgName, projectName).commit.message
       Boolean isUpdatedChangelog = commitMsg == updateChangelogMsg
       if ((env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") && !isUpdatedChangelog) {
@@ -274,7 +275,6 @@ def handleDevPr(String sshCredentialsId, String orgName, String projectName, Str
       latestMergeBranchName = (gitLogLatestMergeString.find(relRegex).trim() =~ relRegex)[0]
     }
 
-    // todo won't work anymore as no "merge" keyword is available anymore -> not even required anymore -> just hand in a PR from main
     // get the latest merge commit sha
     String latestMergeCommitSHA = gitLogLatestMergeString.find("Merge: .* .*\n").trim().split(" ")[2]
 
