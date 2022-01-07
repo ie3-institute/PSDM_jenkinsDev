@@ -10,12 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 {{#tags}}
-
-     {{#ifMatches commits "^\[FEAT\].*$"}}
- TEST : "{{subString . 0 3}}" and number {{subString . 4}}
-        {{/ifMatches}}
-
-
   {{#ifContainsType commits type='feat'}}
     ### Features
 
@@ -25,18 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       {{/ifCommitType}}
     {{/commits}}
   {{/ifContainsType}}
-
-{{#commits}}
- {{#eachCommitScope .}}
-  scope: {{.}}
- {{/eachCommitScope}}
-
-       {{#ifMatches message "^.*FEAT.*"}}
- fixes : "{{subString . 0 3}}" and number {{subString . 4}}
-        {{/ifMatches}}
-{{/commits}}
-
-
 {{/tags}}
 
 
