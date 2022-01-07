@@ -35,6 +35,9 @@ String mavenCentralSignKeyId = 'a1357827-1516-4fa2-ab8e-72cdea07a692' // id that
 /* Rocket.Chat configuration */
 String rocketChatChannel = 'jenkins'
 
+/* update changelog config */
+String updateChangelogMsg = "updated CHANGELOG.md"
+
 /**
  * pipeline configuration
  */
@@ -125,14 +128,16 @@ node {
       }
 
       // update changelog.md if current branch is dev branch
-      if(env.BRANCH_NAME == "dev") {
+      if(env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") {
         stage('changelog update') {
-          changelogUpdate( projectName, sshCredentialsId, gitCheckoutUrl, "dev")
+          changelogUpdate( projectName, sshCredentialsId, gitCheckoutUrl, env.BRANCH_NAME, updateChangelogMsg)
         }
       }
 
-      // deploy stage only if branch is main or dev
-      if (env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") {
+      // deploy stage only if branch is main or dev AND if the commit message is not "updated CHANGELOG.md"
+      String commitMsg = getGithubCommitJsonObj(commitHash, orgName, projectName).commit.message
+      Boolean isUpdatedChangelog = commitMsg == updateChangelogMsg
+      if ((env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") && !isUpdatedChangelog) {
         stage('deploy') {
           // determine project version
           String projectVersion = sh(returnStdout: true, script: "set +x && cd ${projectName}; ./gradlew -q " +
@@ -176,6 +181,10 @@ node {
               "*branch:* ${currentBranchName}\n"
 
           notifyRocketChat(rocketChatChannel, ':jenkins_party:', successMsg)
+        }
+      } else{
+        stage('deploy') {
+          println "last this run is triggered by a changelog updated. Skipping deployment!"
         }
       }
 
@@ -265,6 +274,7 @@ def handleDevPr(String sshCredentialsId, String orgName, String projectName, Str
       latestMergeBranchName = (gitLogLatestMergeString.find(relRegex).trim() =~ relRegex)[0]
     }
 
+    // todo won't work anymore as no "merge" keyword is available anymore -> not even required anymore -> just hand in a PR from main
     // get the latest merge commit sha
     String latestMergeCommitSHA = gitLogLatestMergeString.find("Merge: .* .*\n").trim().split(" ")[2]
 
@@ -279,10 +289,40 @@ def handleDevPr(String sshCredentialsId, String orgName, String projectName, Str
         "git fetch && git checkout $currentBranchName && git pull && " +
         "git checkout -b $latestMergeBranchName $latestMergeCommitSHA && " +
         "git push --set-upstream origin $latestMergeBranchName\"")
-
       }
     } catch (Exception e) {
       println "No need to create a new branch. Can reuse old one."
+    }
+
+    // increment version number and push the adapted version to the release branch
+    try {
+      withCredentials([
+        sshUserPrivateKey(credentialsId: sshCredentialsId, keyFileVariable: 'sshKey')
+      ]) {
+        // increment version
+        String incrementBy = isHotfix ? "incrementPatch" : "incrementMinor"
+        sh(script: "set +x && cd $projectName && ./gradlew $incrementBy spotlessApply &&",returnStdout: false)
+
+        // get version number from version.properties
+        String versionNo = sh(script: "cd $projectName && cat version.properties", returnStdout: true).find("version\\.semver=.*").trim().split("=")[1]
+
+        // set mail and name in git config
+        sh(script: "set +x && cd $projectName && " +
+        "git config user.email 'johannes.hiry@tu-dortmund.de' && " +
+        "git config user.name 'Johannes Hiry'", returnStdout: false)
+
+        // push version increment to latest merge branch
+        sh(script: "set +x && cd $projectName && " +
+        "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
+        "git fetch && git checkout $latestMergeBranchName && git pull && " +
+        "git add version.properties; " +
+        "git commit -m 'increment version to $versionNo'; " +
+        "git push --set-upstream origin $latestMergeBranchName" +
+        "\"",
+        returnStdout: false)
+      }
+    } catch (Exception e) {
+      println "Error during version increment. Exception: $e"
     }
 
     // create PR on dev branch
@@ -291,7 +331,7 @@ def handleDevPr(String sshCredentialsId, String orgName, String projectName, Str
     ]) {
       String issueId = (latestMergeBranchName =~ ".*(#\\d+).*")[0][1]
       String prMessage = "CI generated PR for branch `$latestMergeBranchName` after merging it into `main`.\\n" +
-          "Please review, adapt and merge it into `dev`.\\nResolves $issueId."
+          "Please review, adapt and merge it into `dev`. You particularly review the version number!\\nResolves $issueId."
       String curlCmd = "set +x && " +
           "curl -s -X POST -u johanneshiry:$SimServCIToken -H \"Accept: application/vnd.github.v3+json\"" +
           " https://api.github.com/repos/$orgName/$projectName/pulls" +
@@ -768,26 +808,28 @@ def conventionalCommit(String commitMsg) {
   }
 }
 
-def changelogUpdate(String projectName, String sshCredentialsId, String gitCheckoutUrl, String changelogBranchRef) {
+def changelogUpdate(String projectName, String sshCredentialsId, String gitCheckoutUrl, String changelogBranchRef, String updateChangelogMsg) {
+
+  println "updating changeling in branch $changelogBranchRef ..."
   try {
     withCredentials([
       sshUserPrivateKey(credentialsId: sshCredentialsId, keyFileVariable: 'sshKey')
     ]) {
       // set mail and name in git config
-      println sh(script: "set +x && cd $projectName && " +
+      sh(script: "set +x && cd $projectName && " +
       "git config user.email 'johannes.hiry@tu-dortmund.de' && " +
-      "git config user.name 'Johannes Hiry'", returnStdout: true)
+      "git config user.name 'Johannes Hiry'", returnStdout: false)
 
       // pull latest version of changelogBranch + update changelog + commit + push back
-      println sh(script: "set +x && cd $projectName && " +
+      sh(script: "set +x && cd $projectName && " +
       "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
       "git fetch && git checkout $changelogBranchRef && git pull && " +
       "./gradlew genChangelog -PtoRef=$changelogBranchRef spotlessApply && " +
       "git add CHANGELOG.md; " +
-      "git commit -m 'updated CHANGELOG.md'; " +
+      "git commit -m '$updateChangelogMsg'; " +
       "git push --set-upstream origin $changelogBranchRef" +
       "\"",
-      returnStdout: true)
+      returnStdout: false)
     }
   } catch (Exception e) {
     println "Error during changelog update! Please consider updating it manually! Exception: $e"
