@@ -765,26 +765,13 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       "git config user.email 'johannes.hiry@tu-dortmund.de' && " +
       "git config user.name 'Johannes Hiry'", returnStdout: true)
 
-      println sh(script: "cd $projectName && cat .git/config",
-      returnStdout: true)
-      try {
-        // pull latest version of changelogBranch + update changelog + commit + push back
-        println sh(script: "set +x && cd $projectName && " +
-        "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
-        "git fetch && git checkout $changelogBranchRef && git pull && " +
-        "./gradlew genChangelog -PtoRef=$changelogBranchRef spotlessApply && " +
-        "git add CHANGELOG.md; " +
-        "git commit -m 'updated CHANGELOG.md'; " +
-        "git push --set-upstream origin $changelogBranchRef" +
-        "\"",
-        returnStdout: true)
-      } catch (Exception e) {
-        println "Nothing to commit skipping commit stage! Exception: $e"
-      }
-
+      // pull latest version of changelogBranch + update changelog + commit + push back
       println sh(script: "set +x && cd $projectName && " +
       "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
       "git fetch && git checkout $changelogBranchRef && git pull && " +
+      "./gradlew genChangelog -PtoRef=$changelogBranchRef spotlessApply && " +
+      "git add CHANGELOG.md; " +
+      "git commit -m 'updated CHANGELOG.md'; " +
       "git push --set-upstream origin $changelogBranchRef" +
       "\"",
       returnStdout: true)
@@ -792,8 +779,4 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
   } catch (Exception e) {
     println "Error during changelog update! Please consider updating it manually! Exception: $e"
   }
-
-
-
-
 }
