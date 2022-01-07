@@ -765,6 +765,9 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       "git config user.email 'johannes.hiry@tu-dortmund.de' && " +
       "git config user.name 'Johannes Hiry'", returnStdout: true)
 
+        println sh(script: "cd $projectName && cat .git/config",
+                      returnStdout: true)
+
       // pull latest version of changelogBranch + update changelog + commit + push back
       println sh(script: "set +x && cd $projectName && " +
       "git fetch && git pull && " +
