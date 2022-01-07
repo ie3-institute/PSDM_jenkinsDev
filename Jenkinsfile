@@ -111,6 +111,7 @@ node {
         }
       }
 
+
       // PR name check 4 feature branches only and only if a PR is already handed in
       if(isFeatureBranch(currentBranchName) == 0 && prJsonObj != null){
         stage('PR name check') {
