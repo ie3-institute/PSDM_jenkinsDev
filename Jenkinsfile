@@ -765,8 +765,8 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       "git config user.email 'johannes.hiry@tu-dortmund.de' && " +
       "git config user.name 'Johannes Hiry'", returnStdout: true)
 
-        println sh(script: "cd $projectName && cat .git/config",
-                      returnStdout: true)
+      println sh(script: "cd $projectName && cat .git/config",
+      returnStdout: true)
 
       // pull latest version of changelogBranch + update changelog + commit + push back
       println sh(script: "set +x && cd $projectName && " +
@@ -775,6 +775,15 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       "./gradlew genChangelog -PtoRef=$changelogBranchRef spotlessApply && " +
       "git add CHANGELOG.md; " +
       "git commit -m \"updated CHANGELOG.md\"; " +
+      "git push --set-upstream origin $changelogBranchRef" +
+      "\"",
+      returnStdout: true)
+
+      println sh(script: "cd $projectName && git log;",
+      returnStdout: true)
+
+      println sh(script: "set +x && cd $projectName && " +
+      "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
       "git push --set-upstream origin $changelogBranchRef" +
       "\"",
       returnStdout: true)
