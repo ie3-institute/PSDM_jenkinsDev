@@ -767,17 +767,20 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
 
       println sh(script: "cd $projectName && cat .git/config",
       returnStdout: true)
-
-      // pull latest version of changelogBranch + update changelog + commit + push back
-      println sh(script: "set +x && cd $projectName && " +
-      "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
-      "git fetch && git checkout $changelogBranchRef && git pull && " +
-      "./gradlew genChangelog -PtoRef=$changelogBranchRef spotlessApply && " +
-      "git add CHANGELOG.md; " +
-      "git commit -m \"updated CHANGELOG.md\"; " +
-      "git push --set-upstream origin $changelogBranchRef" +
-      "\"",
-      returnStdout: true)
+      try {
+        // pull latest version of changelogBranch + update changelog + commit + push back
+        println sh(script: "set +x && cd $projectName && " +
+        "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
+        "git fetch && git checkout $changelogBranchRef && git pull && " +
+        "./gradlew genChangelog -PtoRef=$changelogBranchRef spotlessApply && " +
+        "git add CHANGELOG.md; " +
+        "git commit -m \"updated CHANGELOG.md\"; " +
+        "git push --set-upstream origin $changelogBranchRef" +
+        "\"",
+        returnStdout: true)
+      } catch (Exception e) {
+        println "Nothing to commit skipping commit stage! Exception: $e"
+      }
 
       println sh(script: "cd $projectName && git log;",
       returnStdout: true)
