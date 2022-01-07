@@ -45,6 +45,8 @@ fixes : "has" and number : 9a587fc1d0ee4d6 message: [CHORE] fmt
 
 
 
+
+
 ## [2.0.0](https://gitlab.com/html-validate/html-validate/compare/2.0.0) (2021-05-21)
 
 
