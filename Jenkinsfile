@@ -124,6 +124,13 @@ node {
         }
       }
 
+      // update changelog.md if current branch is dev branch
+      if(env.BRANCH_NAME == "dev") {
+        stage('changelog update') {
+          changelogUpdate( projectName, sshCredentialsId, gitCheckoutUrl, "dev")
+        }
+      }
+
       // deploy stage only if branch is main or dev
       if (env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") {
         stage('deploy') {
@@ -745,5 +752,31 @@ def conventionalCommit(String commitMsg) {
     return "breaking"
   } else {
     return null
+  }
+}
+
+def changelogUpdate(String projectName, String sshCredentialsId, String gitCheckoutUrl, String changelogBranchRef) {
+  try {
+    withCredentials([
+      sshUserPrivateKey(credentialsId: sshCredentialsId, keyFileVariable: 'sshKey')
+    ]) {
+      // set mail and name in git config
+      sh(script: "set +x && cd $projectName && " +
+      "git config user.email 'johannes.hiry@tu-dortmund.de' && " +
+      "git config user.name 'Johannes Hiry'", returnStdout: false)
+
+      // pull latest version of changelogBranch + update changelog + commit + push back
+      sh(script: "set +x && cd $projectName && " +
+      "git checkout $changelogBranchRef && git fetch && git pull && " +
+      "ssh-agent bash -c \"set +x && ssh-add $sshKey; " +
+      "./gradlew genChangelog -PtoRef=$toRef spotlessApply && " +
+      "git add CHANGELOG.md && " +
+      "git commit -m \"updated CHANGELOG.md\" && " +
+      "git push" +
+      "\"",
+      returnStdout: false)
+    }
+  } catch (Exception e) {
+    println "Error during changelog update! Please consider updating it manually! Exception: $e"
   }
 }
