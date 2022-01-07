@@ -19,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       {{/ifCommitType}}
     {{/commits}}
   {{/ifContainsType}}
+    {{#ifContainsType commits type='fix'}}
+      ### Fix
+
+      {{#commits}}
+        {{#ifCommitType . type='fix'}}
+    - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+        {{/ifCommitType}}
+      {{/commits}}
+    {{/ifContainsType}}
 {{/tags}}
 
 
