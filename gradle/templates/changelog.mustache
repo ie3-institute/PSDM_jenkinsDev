@@ -10,30 +10,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 {{#tags}}
-{{#ifReleaseTag .}}
-## [{{name}}](https://gitlab.com/html-validate/html-validate/compare/{{name}}) ({{tagDate .}})
+
+     {{#ifMatches commits "^\[FEAT\].*$"}}
+ TEST : "{{subString . 0 3}}" and number {{subString . 4}}
+        {{/ifMatches}}
+
 
   {{#ifContainsType commits type='feat'}}
-### Features
+    ### Features
 
     {{#commits}}
       {{#ifCommitType . type='feat'}}
- - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+  - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
       {{/ifCommitType}}
     {{/commits}}
   {{/ifContainsType}}
 
-  {{#ifContainsType commits type='fix'}}
-### Bug Fixes
+{{#commits}}
+ {{#eachCommitScope .}}
+  scope: {{.}}
+ {{/eachCommitScope}}
 
-    {{#commits}}
-      {{#ifCommitType . type='fix'}}
- - {{#eachCommitScope .}} **{{.}}** {{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
-      {{/ifCommitType}}
-    {{/commits}}
-  {{/ifContainsType}}
+       {{#ifMatches message "^.*FEAT.*"}}
+ fixes : "{{subString . 0 3}}" and number {{subString . 4}}
+        {{/ifMatches}}
+{{/commits}}
 
-{{/ifReleaseTag}}
+
 {{/tags}}
 
 
