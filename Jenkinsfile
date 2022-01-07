@@ -795,4 +795,8 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
   } catch (Exception e) {
     println "Error during changelog update! Please consider updating it manually! Exception: $e"
   }
+
+
+
+
 }
