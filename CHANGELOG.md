@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](https://gitlab.com/html-validate/html-validate/compare/Unreleased) ()
 
 
+hash: 9a587fc1d0ee4d6 message: [CHORE] fmt
+fixes : "has" and number : 9a587fc1d0ee4d6 message: [CHORE] fmt
 
 
 
@@ -16,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Bug Fixes
 
- -  test ([f885445623adbec](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/f885445623adbec))
+-  test ([f885445623adbec](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/f885445623adbec))
 
 
 
@@ -30,13 +32,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Bug Fixes
 
- -  further formatting fixes (Codacy + Jenkins) ([06bc738cdeb2ce9](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/06bc738cdeb2ce9))
- -  applied spotless with java 8 (instead of 11) ([fd9f8296f544c65](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/fd9f8296f544c65))
- -  resolved static code analysis issues + applied spotless ([99d8efa1a3fcd7d](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/99d8efa1a3fcd7d))
+-  further formatting fixes (Codacy + Jenkins) ([06bc738cdeb2ce9](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/06bc738cdeb2ce9))
+-  applied spotless with java 8 (instead of 11) ([fd9f8296f544c65](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/fd9f8296f544c65))
+-  resolved static code analysis issues + applied spotless ([99d8efa1a3fcd7d](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/99d8efa1a3fcd7d))
 
 
 
 ## [2.0.1](https://gitlab.com/html-validate/html-validate/compare/2.0.1) (2021-07-09)
+
 
 
 
@@ -70,15 +73,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [v1.0](https://gitlab.com/html-validate/html-validate/compare/v1.0) (2020-04-17)
-
-
-
-
-
-
-
-
-
-
-
-
