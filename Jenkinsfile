@@ -112,12 +112,12 @@ node {
       }
 
       // PR name check 4 feature branches only and only if a PR is already handed in
-      if(isFeatureBranch(currentBranchName) == 0 && prJsonObj != null){
+      if((isFeatureBranch(currentBranchName) == 0 || isReleaseBranch(currentBranchName) == 0) && prJsonObj != null){
         stage('PR name check') {
           String prName = prJsonObj.title
           if(!isConventionalCommit(prName)){
             String errorMsg = "PR title '$prName' does not match conventional commit convention. " +
-                "Please add a prefix in front of your PR title, e.g. fix: or feat: ..."
+                "Please add a prefix in front of your PR title, e.g. fix:, feat:, release:, ..."
             println errorMsg
             error errorMsg
           }
@@ -529,13 +529,23 @@ def getPRJsonObj(String orgName, String projectName, String changeId) {
 }
 
 
-
 def isFeatureBranch(String branchName){
   String branchType = prFromFork() ? "feature" : getBranchType(branchName)
   if (branchType == null) {
     error "Cannot derive branch type from current branch with name '$branchName'."
   }
   if(branchType == "feature"){
+    return 0
+  }
+  return -1
+}
+
+def isReleaseBranch(String branchName){
+  String branchType = prFromFork() ? "release" : getBranchType(branchName)
+  if (branchType == null) {
+    error "Cannot derive branch type from current branch with name '$branchName'."
+  }
+  if(branchType == "release"){
     return 0
   }
   return -1
@@ -733,12 +743,13 @@ def isConventionalCommit(String commitMsg){
 }
 
 def conventionalCommit(String commitMsg) {
-  String fix_pattern = "fix\\s.*"
-  String feat_pattern = "feat\\s.*"
-  String improve_pattern = "improve\\s.*"
-  String breaking_pattern = "breaking\\s.*"
-  String dependabot_pattern = "bump\\s.*"
-  String chore_pattern = "chore\\s.*"
+  String fix_pattern = "fix:\\s.*"
+  String feat_pattern = "feat:\\s.*"
+  String improve_pattern = "improve:\\s.*"
+  String breaking_pattern = "breaking:\\s.*"
+  String dependabot_pattern = "bump:\\s.*"
+  String chore_pattern = "chore:\\s.*"
+  String release_pattern = "release:\\s.*"
 
   if (commitMsg =~ chore_pattern || commitMsg =~ dependabot_pattern) {
     return "chore"
@@ -750,6 +761,8 @@ def conventionalCommit(String commitMsg) {
     return "improve"
   } else if (commitMsg =~ breaking_pattern) {
     return "breaking"
+  } else if (commitMsg =~ release_pattern ) {
+    return "release"
   } else {
     return null
   }
