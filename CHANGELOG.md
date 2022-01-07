@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -  test of type matching ([1f28bb6c5de6a5d](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/1f28bb6c5de6a5d))
 	### Fix
 
+	-  jenkinsfile fix ([f347c3f27b71014](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/f347c3f27b71014))
 	-  Jenkinsfile changelogupdate ([ad63e0dcfcc5621](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/ad63e0dcfcc5621))
 	-  fixed mustache ([16720a0e59bd2d9](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/16720a0e59bd2d9))
 	-  new Jenkinsfile ([168f594483c4378](https://github.com/ie3-institute/PSDM_jenkinsDev/commit/168f594483c4378))
