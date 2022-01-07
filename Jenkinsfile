@@ -35,6 +35,9 @@ String mavenCentralSignKeyId = 'a1357827-1516-4fa2-ab8e-72cdea07a692' // id that
 /* Rocket.Chat configuration */
 String rocketChatChannel = 'jenkins'
 
+/* update changelog config */
+String updateChangelogMsg = "updated CHANGELOG.md"
+
 /**
  * pipeline configuration
  */
@@ -125,14 +128,15 @@ node {
       }
 
       // update changelog.md if current branch is dev branch
-      if(env.BRANCH_NAME == "dev") {
+      if(env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") {
         stage('changelog update') {
-          changelogUpdate( projectName, sshCredentialsId, gitCheckoutUrl, "dev")
+          changelogUpdate( projectName, sshCredentialsId, gitCheckoutUrl, env.BRANCH_NAME)
         }
       }
 
-      // deploy stage only if branch is main or dev
-      if (env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") {
+      // deploy stage only if branch is main or dev AND if the commit message is not "updated CHANGELOG.md"
+      Boolean isUpdatedChangelog = curlByCSHA(commitHash, orgName, projectName).commit.message == updateChangelogMsg
+      if ((env.BRANCH_NAME == "main" || env.BRANCH_NAME == "dev") && !isUpdatedChangelog) {
         stage('deploy') {
           // determine project version
           String projectVersion = sh(returnStdout: true, script: "set +x && cd ${projectName}; ./gradlew -q " +
@@ -176,6 +180,10 @@ node {
               "*branch:* ${currentBranchName}\n"
 
           notifyRocketChat(rocketChatChannel, ':jenkins_party:', successMsg)
+        }
+      } else{
+        stage('deploy') {
+          println "last this run is triggered by a changelog updated. Skipping deployment!"
         }
       }
 
@@ -817,7 +825,7 @@ def changelogUpdate(String projectName, String sshCredentialsId, String gitCheck
       "git fetch && git checkout $changelogBranchRef && git pull && " +
       "./gradlew genChangelog -PtoRef=$changelogBranchRef spotlessApply && " +
       "git add CHANGELOG.md; " +
-      "git commit -m 'updated CHANGELOG.md'; " +
+      "git commit -m '$updateChangelogMsg'; " +
       "git push --set-upstream origin $changelogBranchRef" +
       "\"",
       returnStdout: false)
