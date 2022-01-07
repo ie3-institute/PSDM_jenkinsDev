@@ -117,7 +117,7 @@ node {
           String prName = prJsonObj.title
           if(!isConventionalCommit(prName)){
             String errorMsg = "PR title '$prName' does not match conventional commit convention. " +
-                "Please add a prefix in front of your PR title, e.g. [FIX] or [FEAT] ..."
+                "Please add a prefix in front of your PR title, e.g. fix: or feat: ..."
             println errorMsg
             error errorMsg
           }
@@ -726,12 +726,12 @@ def isConventionalCommit(String commitMsg){
 }
 
 def conventionalCommit(String commitMsg) {
-  String fix_pattern = "\\[FIX\\]\\s.*"
-  String feat_pattern = "\\[FEAT\\]\\s.*"
-  String improve_pattern = "\\[IMPROVE\\]\\s.*"
-  String breaking_pattern = "\\[BREAKING\\]\\s.*"
-  String dependabot_pattern = "Bump\\s.*"
-  String chore_pattern = "\\[CHORE\\]\\s.*"
+  String fix_pattern = "fix\\s.*"
+  String feat_pattern = "feat\\s.*"
+  String improve_pattern = "improve\\s.*"
+  String breaking_pattern = "breaking\\s.*"
+  String dependabot_pattern = "bump\\s.*"
+  String chore_pattern = "chore\\s.*"
 
   if (commitMsg =~ chore_pattern || commitMsg =~ dependabot_pattern) {
     return "chore"
